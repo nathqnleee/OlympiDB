@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 const pool = require('./db');
 
-router.get('/data', (req, res) => {
-  pool.query('SELECT * FROM Coach', (error, results) => {
+router.get('/tables', (req, res) => {
+  pool.query('SHOW tables', (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Error fetching data from the database');
@@ -13,6 +13,20 @@ router.get('/data', (req, res) => {
     }
   });
 });
+
+router.get('/tableAttributes/:table', (req, res) => {
+    const table = req.params.table;
+    const query = `SHOW COLUMNS FROM ${pool.escapeId(table)}`;
+    
+    pool.query(query, (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error fetching data from the database');
+      } else {
+        res.json(results);
+      }
+    });
+  });
 
 router.get('/country', (req, res) => {
   pool.query('SELECT CountryName FROM Country', (error, results) => {
@@ -38,6 +52,65 @@ router.get('/coach/:country', (req, res) => {
   });
 });
 
+//group medalists by country and medal
+router.get('/medalCount/:MedalType', (req, res) => {
+    const medalType = req.params.MedalType;
+  
+    if (!medalType) {
+      return res.status(400).send('MedalType header is missing');
+    }
+  
+    const query = `
+    SELECT CountryName, count(a.PlayerId)
+    FROM Athlete a, Medalist m
+    WHERE MedalType = ? AND m.PlayerID = a.PlayerID
+    GROUP BY CountryName
+    ORDER BY count(a.PlayerID) DESC
+  `;
+  
+    pool.query(query, [medalType], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error fetching data from the database');
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
+  //nested age agg
+router.get('/ageQuery', (req, res) => {
+    const query = `
+    SELECT CountryName, min(a1.Age)
+    FROM Athlete a1
+    GROUP BY CountryName
+    HAVING AVG(a1.Age) < (SELECT AVG(a2.Age)
+                    FROM Athlete a2)
+  `;
+  
+    pool.query(query, (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error fetching data from the database');
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
+router.get('/medalists', (req, res) => {
+    pool.query('SELECT *  FROM Medalist m, Athlete a WHERE a.PlayerID = m.PlayerID;', (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error fetching data from the database');
+      } else {
+        res.json(results);
+      }
+    });
+  });
+
+
+// POST REQUESTS
 router.post('/insertAthlete', (req, res) => {
     console.log(req.body)
     const { FirstName, LastName, Age, Gender, CountryName, CoachID } = req.body;

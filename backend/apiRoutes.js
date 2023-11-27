@@ -109,12 +109,21 @@ router.get('/medalists', (req, res) => {
     });
   });
 
+  router.get('/athletes', (req, res) => {
+    pool.query('SELECT PlayerID, FirstName, LastName FROM Athlete', (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error fetching data from the database');
+      } else {
+        res.json(results);
+      }
+    });
+  });
 
-// POST REQUESTS
+
+// insert athlete
 router.post('/insertAthlete', (req, res) => {
-    console.log(req.body)
     const { FirstName, LastName, Age, Gender, CountryName, CoachID } = req.body;
-    console.log(req.body)
   
     // Generate a random number between 50 and 100 for PlayerID (to avoid duplication hopefully)
     const PlayerID = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
@@ -134,4 +143,20 @@ router.post('/insertAthlete', (req, res) => {
     });
   });
 
+  
+// update athlete
+  router.post('/updateAthlete', (req, res) => {
+    const { Age, CoachID, CountryName, PlayerID } = req.body;
+
+    const query = `UPDATE Athlete SET Age = ?, CoachID = ?, CountryName = ? WHERE PlayerID = ?;`;
+  
+    pool.query(query, [Age, CoachID, CountryName, PlayerID], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error updating data in the database' });
+      } else {
+        res.json({ message: 'Athlete updated successfully', data: results });
+      }
+    });
+  });
 module.exports = router;

@@ -39,3 +39,31 @@ export const fetchCoachesByCountry = async (country) => {
       throw error;
     }
   };
+
+  //update component
+
+  export const fetchAthletes = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/athletes`);
+      // console.log(response);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  };
+
+  export const updateAthlete = async (athleteData) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/updateAthlete`, athleteData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      console.error('Error inserting athlete:', error);
+      throw error;
+    }
+  };

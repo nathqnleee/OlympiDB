@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import UpdateDatabase from "./screens/updateDatabase";
+import ManageDatabase from "./screens/manageDatabase";
 import SearchDatabase from "./screens/searchDatabase";
 
 function App() {
@@ -8,7 +8,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<UpdateDatabase />} />
+          <Route path="/" element={<ManageDatabase />} />
           <Route path="/searchDatabase" element={<SearchDatabase />} />
         </Routes>
       </BrowserRouter>

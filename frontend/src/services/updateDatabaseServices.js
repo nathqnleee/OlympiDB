@@ -63,7 +63,23 @@ export const fetchCoachesByCountry = async (country) => {
       console.log(response);
       return response.data;
     } catch (error) {
-      console.error('Error inserting athlete:', error);
+      console.error('Error updating athlete:', error);
+      throw error;
+    }
+  };
+
+  // delete
+  export const deleteAthlete = async (athleteData) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/deleteAthlete`, athleteData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting athlete:', error);
       throw error;
     }
   };

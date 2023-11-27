@@ -81,14 +81,15 @@ function UpdateDatabase() {
           .then(response => {
             console.log(response);
           })
-          .catch(error => console.error('Error inserting athlete:', error));
+          .catch(error => console.error('Error updating athlete:', error));
       };
+
     return (
       <div className="updateDatabasePage">
         <h1>Update Athlete</h1>
       <form onSubmit={handleUpdateAthlete}>
       <label>
-            Update Record of Athlete:
+      Update Record of Athlete: 
             <select id="athleteSelect" value={selectedAthlete} onChange={handleAthleteChange}>
                 <option value="" disabled>Select an athlete</option>
                 {athletes.map(athlete => (

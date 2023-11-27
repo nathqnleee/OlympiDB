@@ -159,4 +159,20 @@ router.post('/insertAthlete', (req, res) => {
       }
     });
   });
+
+// update athlete
+router.post('/deleteAthlete', (req, res) => {
+  const { PlayerID } = req.body;
+
+  const query = `DELETE FROM Athlete WHERE PlayerID = ?`;
+
+  pool.query(query, [PlayerID], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error deleting Athlete in the database' });
+    } else {
+      res.json({ message: 'Athlete deleted successfully', data: results });
+    }
+  });
+});
 module.exports = router;

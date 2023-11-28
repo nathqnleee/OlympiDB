@@ -3,6 +3,39 @@ const express = require('express');
 const router = express.Router();
 const pool = require('./db');
 
+
+// FETCH THE DATA FROM THE SQL DATABASE 
+router.post('/fetchData', async (req, res) => {
+  console.log(req.body); // Check if data is coming in the request body
+  const { relation, selectedAttributes } = req.body;
+
+  try {
+    const placeholders = selectedAttributes.map(() => '?').join(', ');
+    const query = `SELECT ${selectedAttributes.map(attr => pool.escapeId(attr)).join(', ')} FROM ${pool.escapeId(relation)}`;
+
+    pool.query(query, selectedAttributes, (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error fetching data from the database');
+      } else {
+        // Transform the results into a hashmap
+        const resultMap = results.map(row => {
+          const rowMap = {};
+          selectedAttributes.forEach(attr => {
+            rowMap[attr] = row[attr];
+          });
+          return rowMap;
+        });
+
+        res.json(resultMap);
+      }
+    });
+  } catch (error) {
+    console.error('Error processing request:', error);
+    res.status(500).send('Error processing request');
+  }
+});
+
 router.get('/tables', (req, res) => {
   pool.query('SHOW tables', (error, results) => {
     if (error) {

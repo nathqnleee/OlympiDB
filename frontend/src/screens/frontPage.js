@@ -10,7 +10,6 @@ function frontPage() {
             <h1>Olympics Database Application</h1>
           </header>
           <Link to ="/searchDatabase">Search Database    </Link>
-          
           <Link to ="/manageDatabase">Manage Database</Link>
         </div>
       );

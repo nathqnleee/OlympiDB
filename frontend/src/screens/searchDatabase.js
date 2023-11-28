@@ -9,6 +9,8 @@ function SearchDatabase() {
   const [relations, setRelations] = useState([]);
   const [selectedRelation, setSelectedRelation] = useState('');
   const [attributes, setAttributes] = useState([]);
+  const [selectedAttributes, setSelectedAttributes] = useState([]);
+
 
   useEffect(() => {
     fetchTables()
@@ -33,11 +35,21 @@ function SearchDatabase() {
   const handleRelationChange = (event) => {
     const { value } = event.target;
     setSelectedRelation(value);
+    setSelectedAttributes([]); // Reset selected attributes when relation changes
     console.log(value);
   };
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
+  };
+
+  const handleCheckboxChange = (attribute) => {
+    const isChecked = selectedAttributes.includes(attribute);
+    if (isChecked) {
+      setSelectedAttributes(selectedAttributes.filter(item => item !== attribute));
+    } else {
+      setSelectedAttributes([...selectedAttributes, attribute]);
+    }
   };
 
   return (
@@ -74,7 +86,10 @@ function SearchDatabase() {
           <div className="attributeCheckboxes">
             {attributes.map(attribute => (
               <label key={attribute.Field}>
-                <input type="checkbox" />
+                <input type="checkbox"
+                checked={selectedAttributes.includes(attribute.Field)}
+                onChange={() => handleCheckboxChange(attribute.Field)}
+                />
                 {attribute.Field}
               </label>
             ))}
@@ -100,7 +115,7 @@ function SearchDatabase() {
           Show athletes who have won all medal types{" "}
           <button className="Btn"> Show </button>
         </div>
-        <ResultsTable></ResultsTable>
+        <ResultsTable selectedAttributes={selectedAttributes}/>
         
       </div>
     </>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchDataByAttributes } from "../services/searchDatabaseServices";
+import { fetchDataByAttributes} from "../services/searchDatabaseServices";
 
 function ResultsTable({ selectedRelation, selectedAttributes }) {
   const [tableData, setTableData] = useState([]);

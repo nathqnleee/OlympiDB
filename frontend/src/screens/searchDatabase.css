@@ -38,6 +38,11 @@
   padding-bottom: 20px;
 }
 
+.sortBy {
+  text-size: 100px;
+  padding-bottom: 20px;
+}
+
 .select {
   margin-left: 10px;
   border-radius: 10px;

@@ -10,7 +10,7 @@ function SearchDatabase() {
   const [selectedRelation, setSelectedRelation] = useState('');
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
-
+  const [fetchedData, setFetchedData] = useState([]);
 
   useEffect(() => {
     fetchTables()
@@ -32,6 +32,15 @@ function SearchDatabase() {
     }
   }, [selectedRelation]);
 
+  useEffect(() => {
+    fetchDataByAttributes(selectedRelation, selectedAttributes)
+    .then(data => {
+        console.log(data);
+        setFetchedData(data);
+      })
+      .catch(error => console.error('Error fetching table names:', error));
+  }, [fetchedData]);
+
   const handleRelationChange = (event) => {
     const { value } = event.target;
     setSelectedRelation(value);
@@ -43,13 +52,18 @@ function SearchDatabase() {
     setInputValue(e.target.value);
   };
 
-  const handleCheckboxChange = (attribute) => {
-    const isChecked = selectedAttributes.includes(attribute);
-    if (isChecked) {
-      setSelectedAttributes(selectedAttributes.filter(item => item !== attribute));
-    } else {
-      setSelectedAttributes([...selectedAttributes, attribute]);
-    }
+  const handleCheckboxChange = (event) => {
+    const attributeName = event.target.name;
+  
+    setSelectedAttributes((prevAttributes) => {
+      const isChecked = prevAttributes.includes(attributeName);
+  
+      if (isChecked) {
+        return prevAttributes.filter((item) => item !== attributeName);
+      } else {
+        return [...prevAttributes, attributeName];
+      }
+    });
   };
 
   return (
@@ -88,16 +102,14 @@ function SearchDatabase() {
               <label key={attribute.Field}>
                 <input type="checkbox"
                 checked={selectedAttributes.includes(attribute.Field)}
-                onChange={() => handleCheckboxChange(attribute.Field)}
+                onChange={handleCheckboxChange}
+                name={attribute.Field} // Use 'name' instead of 'value'
                 />
                 {attribute.Field}
               </label>
             ))}
           </div>
         )}
-
-        {selectedRelation === "Athlete" && (
-          <div>
         <div className="show">
           <label>
             Show number of
@@ -118,9 +130,8 @@ function SearchDatabase() {
           Show athletes who have won all medal types{" "}
           <button className="Btn"> Show </button>
         </div>
-        </div>
-        )}
-        <ResultsTable selectedAttributes={selectedAttributes}/>
+        <ResultsTable/>
+        
       </div>
     </>
   );

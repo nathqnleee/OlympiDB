@@ -5,7 +5,7 @@ const pool = require('./db');
 
 
 // FETCH THE DATA FROM THE SQL DATABASE 
-router.get('/fetchData', async (req, res) => {
+router.get('/tableAttributes/:tables', async (req, res) => {
   console.log(req.body); // Check if data is coming in the request body
   const { relation, selectedAttributes } = req.body;
 
@@ -15,7 +15,6 @@ router.get('/fetchData', async (req, res) => {
       return res.status(400).send('Relation is missing');
     }
 
-    const placeholders = selectedAttributes.map(() => '?').join(', ');
     const query = `SELECT ${selectedAttributes.map(attr => pool.escapeId(attr)).join(', ')} FROM ${pool.escapeId(relation)}`;
 
     pool.query(query, selectedAttributes, (error, results) => {
@@ -31,6 +30,7 @@ router.get('/fetchData', async (req, res) => {
     res.status(500).send('Error processing request');
   }
 });
+
 router.get('/tables', (req, res) => {
   pool.query('SHOW tables', (error, results) => {
     if (error) {

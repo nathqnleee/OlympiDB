@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Olympics from "../olympics.png";
 import ResultsTable from "../components/resultsTable";
-import { fetchTables, fetchAttributesByRelation } from "../services/searchDatabaseServices";
+import { fetchTables, fetchAttributesByRelation, fetchDataByAttributes } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
 
 function SearchDatabase() {
@@ -95,6 +95,9 @@ function SearchDatabase() {
             ))}
           </div>
         )}
+
+        {selectedRelation === "Athlete" && (
+          <div>
         <div className="show">
           <label>
             Show number of
@@ -115,8 +118,9 @@ function SearchDatabase() {
           Show athletes who have won all medal types{" "}
           <button className="Btn"> Show </button>
         </div>
+        </div>
+        )}
         <ResultsTable selectedAttributes={selectedAttributes}/>
-        
       </div>
     </>
   );

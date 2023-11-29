@@ -5,11 +5,16 @@ const pool = require('./db');
 
 
 // FETCH THE DATA FROM THE SQL DATABASE 
-router.post('/fetchData', async (req, res) => {
+router.get('/fetchData', async (req, res) => {
   console.log(req.body); // Check if data is coming in the request body
   const { relation, selectedAttributes } = req.body;
 
   try {
+    // Ensure `relation` is defined before executing the query
+    if (!relation) {
+      return res.status(400).send('Relation is missing');
+    }
+
     const placeholders = selectedAttributes.map(() => '?').join(', ');
     const query = `SELECT ${selectedAttributes.map(attr => pool.escapeId(attr)).join(', ')} FROM ${pool.escapeId(relation)}`;
 
@@ -18,16 +23,7 @@ router.post('/fetchData', async (req, res) => {
         console.error(error);
         res.status(500).send('Error fetching data from the database');
       } else {
-        // Transform the results into a hashmap
-        const resultMap = results.map(row => {
-          const rowMap = {};
-          selectedAttributes.forEach(attr => {
-            rowMap[attr] = row[attr];
-          });
-          return rowMap;
-        });
-
-        res.json(resultMap);
+        res.json(results);
       }
     });
   } catch (error) {
@@ -35,7 +31,6 @@ router.post('/fetchData', async (req, res) => {
     res.status(500).send('Error processing request');
   }
 });
-
 router.get('/tables', (req, res) => {
   pool.query('SHOW tables', (error, results) => {
     if (error) {

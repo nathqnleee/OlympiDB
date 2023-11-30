@@ -75,6 +75,22 @@ function SearchDatabase() {
     }
   };
 
+  //join methods
+  const handleMedalChange = (event) => {
+    const { value } = event.target;
+    setSelectedMedal(value);
+  };
+
+  const handleJoinQuery = (event) => {
+    event.preventDefault();
+    console.log(selectedMedal)
+    fetchAlthetesByMedal(selectedMedal, selectedAttributes)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {console.error('Error updating athlete:', error)});
+  };
+
   return (
     <>
       <div className="search">

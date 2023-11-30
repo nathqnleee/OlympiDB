@@ -29,11 +29,18 @@ export const fetchAttributesByRelation = async (relation) => {
 export const fetchDataByAttributes = async (selectedRelation, selectedAttributes) => {
   try {
     const config = {
-      params: { selectedRelation, selectedAttributes },
+      headers: {
+        'Content-Type': 'application/json',
+      },
     };
-    console.log('Axios request:', config);
-    console.log("Relation:", selectedRelation);
-    const response = await axios.get(`${API_BASE_URL}/fetchData`, config);
+
+    const requestBody = {
+      selectedRelation: selectedRelation,
+      selectedAttributes: selectedAttributes,
+    };
+    console.log(requestBody)
+
+    const response = await axios.post(`${API_BASE_URL}/fetchData`, requestBody, config);
 
     console.log("Response from server:", response.data);
     return response.data;

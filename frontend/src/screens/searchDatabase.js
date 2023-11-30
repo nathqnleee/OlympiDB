@@ -120,7 +120,7 @@ function SearchDatabase() {
         </div>
         </div>
         )}
-        <ResultsTable selectedAttributes={selectedAttributes}/>
+        <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation}/>
       </div>
     </>
   );

@@ -3,34 +3,31 @@ const express = require("express");
 const router = express.Router();
 const pool = require("./db");
 
-// FETCH THE DATA FROM THE SQL DATABASE
-router.get("/fetchData", async (req, res) => {
-  console.log(req.query); // Check if data is coming in the request body
-  const { selectedRelation, selectedAttributes } = req.query;
+router.post('/fetchData', (req, res) => {
+  const { selectedRelation, selectedAttributes } = req.body;
+  console.log(selectedAttributes)
 
-  try {
-    // Ensure `relation` is defined before executing the query
-    if (!selectedRelation) {
-      return res.status(400).send("Relation is missing");
-    }
-
-    const placeholders = selectedAttributes.map(() => "?").join(", ");
-    const query = `SELECT ${selectedAttributes
-      .map((attr) => pool.escapeId(attr))
-      .join(", ")} FROM ${pool.escapeId(relation)}`;
-
-    pool.query(query, selectedAttributes, (error, results) => {
-      if (error) {
-        console.error(error);
-        res.status(500).send("Error fetching data from the database");
-      } else {
-        res.json(results);
-      }
-    });
-  } catch (error) {
-    console.error("Error processing request:", error);
-    res.status(500).send("Error processing request");
+  if (!selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
   }
+
+  // Create the SELECT clause based on the selected attributes
+  const selectClause = selectedAttributes.join(', ');
+
+  // Construct the query
+  const query = `
+    SELECT ${selectClause}
+    FROM ${selectedRelation}
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
 });
 
 router.get("/tables", (req, res) => {

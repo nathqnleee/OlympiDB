@@ -8,6 +8,8 @@ function ResultsTable({ selectedRelation, selectedAttributes }) {
     const fetchData = async () => {
       try {
         if (selectedAttributes.length > 0) {
+          console.log(selectedAttributes)
+          console.log(selectedRelation)
           const data = await fetchDataByAttributes(selectedRelation, selectedAttributes);
           console.log('Fetched data:', data);
           setTableData(data);

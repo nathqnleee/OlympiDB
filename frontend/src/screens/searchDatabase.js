@@ -14,6 +14,9 @@ function SearchDatabase() {
   const [countries, setAvailableCountries] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState([]);
 
+    //join
+    const [selectedMedal, setSelectedMedal] = useState('');
+
   useEffect(() => {
     fetchTables()
       .then(data => {

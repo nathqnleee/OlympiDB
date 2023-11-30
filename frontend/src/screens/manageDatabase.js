@@ -5,6 +5,7 @@ import InsertDatabase from '../components/InsertDatabase';
 import UpdateDatabase from '../components/UpdateDatabase';
 import DeleteDatabase from '../components/deleteDatabase';
 
+
 function ManageDatabase() {
     
     return (

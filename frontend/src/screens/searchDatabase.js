@@ -3,6 +3,7 @@ import Olympics from "../olympics.png";
 import ResultsTable from "../components/resultsTable";
 import { fetchTables, fetchAttributesByRelation, fetchDataByAttributes } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
+import {Link} from 'react-router-dom';
 
 function SearchDatabase() {
   const [inputValue, setInputValue] = useState("");
@@ -58,6 +59,7 @@ function SearchDatabase() {
         <div className="image">
           <img src={Olympics} alt="Olympics Logo" />
         </div>
+        <Link to ="/login">Manage Database</Link>
         <div className="inputBoxContainer">
           <input
             className="inputBox"

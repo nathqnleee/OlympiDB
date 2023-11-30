@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchCountries, fetchCoachesByCountry, insertAthlete } from '../services/updateDatabaseServices';
+import {Link} from 'react-router-dom';
 
 function InsertDatabase() {
     const [countries, setCountries] = useState([]);
@@ -87,6 +88,7 @@ function InsertDatabase() {
   
     return (
       <div className="updateDatabasePage">
+        <Link to ="/searchDatabase">Search Database</Link>
         <h1>Insert Athlete</h1>
         {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}

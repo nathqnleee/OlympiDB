@@ -72,3 +72,14 @@ export const fetchMedalQuery = async (MedalType) => {
     throw error;
   }
 };
+
+export const fetchGenderQuery = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/genderQuery`);
+    console.log("response from server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error returning gender query:', error);
+    throw error;
+  }
+};

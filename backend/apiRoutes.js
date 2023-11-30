@@ -129,6 +129,34 @@ router.get("/ageQuery", (req, res) => {
   });
 });
 
+// aggregation with having
+router.get("/genderQuery", (req, res) => {
+  const query = `
+  SELECT CountryName, Gender, COUNT(a.PlayerId) AS GenderCount
+  FROM Athlete a, Medalist m
+  WHERE Gender = 'Female' AND MedalType = 'Gold' AND m.PlayerID = a.PlayerId
+  GROUP BY CountryName, Gender
+  HAVING GenderCount > IFNULL(
+      (
+          SELECT COUNT(a2.PlayerId) 
+          FROM Athlete a2, Medalist m2
+          WHERE Gender = 'Male' AND MedalType = 'Gold' AND a.CountryName = a2.CountryName AND m2.PlayerID = a2.PlayerId
+          GROUP BY a2.CountryName, a2.Gender
+      ),
+      0
+  )
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Error fetching data from the database");
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 router.get("/medalists", (req, res) => {
   pool.query(
     "SELECT *  FROM Medalist m, Athlete a WHERE a.PlayerID = m.PlayerID;",
@@ -216,4 +244,6 @@ router.post("/deleteAthlete", (req, res) => {
     }
   });
 });
+
+
 module.exports = router;

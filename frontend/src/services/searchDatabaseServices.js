@@ -86,3 +86,26 @@ export const fetchByFilter = async (selectedRelation, selectedAttributes, select
   }
 };
 
+export const fetchAlthetesByMedal = async (medalType, selectedAttributes) => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const requestBody = {
+      medalType: medalType,
+      selectedAttributes: selectedAttributes,
+    };
+    console.log(requestBody)
+
+    const response = await axios.post(`${API_BASE_URL}/joinMedalists`, requestBody, config);
+
+    console.log("Response from server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};

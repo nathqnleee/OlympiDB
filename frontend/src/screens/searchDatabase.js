@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Olympics from "../olympics.png";
 import ResultsTable from "../components/resultsTable";
-import { fetchTables, fetchAttributesByRelation, fetchDataByAttributes } from "../services/searchDatabaseServices";
+import AgeTable from "../components/ageTable";
+import MedalTable from "../components/medalTable";
+import { fetchTables, fetchAttributesByRelation, fetchDataByAttributes, fetchAgeQuery, fetchMedalQuery } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
 import {Link} from 'react-router-dom';
 
@@ -11,6 +13,10 @@ function SearchDatabase() {
   const [selectedRelation, setSelectedRelation] = useState('');
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [selectedMedal, setSelectedMedal] = useState('')
+  const [showAgeTable, setShowAgeTable] = useState(false);
+  const [showMedalTable, setShowMedalTable] = useState(false);
+
 
 
   useEffect(() => {
@@ -38,6 +44,8 @@ function SearchDatabase() {
     setSelectedRelation(value);
     setSelectedAttributes([]); // Reset selected attributes when relation changes
     console.log(value);
+    setShowAgeTable(false)
+    setShowMedalTable(false)
   };
 
   const handleInputChange = (e) => {
@@ -46,12 +54,50 @@ function SearchDatabase() {
 
   const handleCheckboxChange = (attribute) => {
     const isChecked = selectedAttributes.includes(attribute);
+    setShowAgeTable(false)
+    setShowMedalTable(false)
     if (isChecked) {
       setSelectedAttributes(selectedAttributes.filter(item => item !== attribute));
     } else {
       setSelectedAttributes([...selectedAttributes, attribute]);
     }
   };
+
+
+    const handleShowYoungest = (event)  => {
+      // const ydata = fetchAgeQuery();
+      try {
+        const data = fetchAgeQuery()
+        console.log("query:", data)
+        setSelectedAttributes([])
+       // setSelectedRelation("Athlete")
+        setShowAgeTable(true)
+        setShowMedalTable(false)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setShowAgeTable(false)
+      }
+    };
+
+    useEffect(() => {
+      if (selectedMedal) {
+        fetchMedalQuery(selectedMedal)
+          .then(data => {
+            console.log('query:', data)
+            setShowMedalTable(true)
+            setShowAgeTable(false)
+          })
+          .catch(error => console.error('Error fetching medals:', error));
+          setShowMedalTable(false)
+      }
+    }, [selectedMedal]);
+  
+    const handleShowMedal = (event) => {
+      const { value } = event.target;
+      setSelectedMedal(value);
+      // setSelectedAttributes([]); // Reset selected attributes when relation changes
+      console.log(value);
+    };
 
   return (
     <>
@@ -103,17 +149,20 @@ function SearchDatabase() {
         <div className="show">
           <label>
             Show number of
-            <select className="select">
-              <option value="attribute"> Gold </option>
-              <option value="attribute"> Silver </option>
-              <option value="attribute"> Bronze </option>
+            <select className="select" value={selectedMedal} onChange={handleShowMedal}>
+              <option value="Gold"> Gold </option>
+              <option value="Silver"> Silver </option>
+              <option value="Bronze"> Bronze </option>
             </select>
           </label>{" "}
           medals per country
           <button className="Btn"> Search </button>
         </div>
         <div className="show">
-          Show athletes with ... <button className="Btn"> Show </button>
+          Show youngest athletes for countries with avg. athlete
+           age that is lower than average athlete age over
+            all countries 
+            <button className="Btn" onClick={handleShowYoungest}> Show </button>
         </div>
         <div className="show">aggregation with having query?</div>
         <div className="show">
@@ -122,10 +171,14 @@ function SearchDatabase() {
         </div>
         </div>
         )}
+
+        
         <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation}/>
+        {showMedalTable && <MedalTable selectedMedal={selectedMedal} />}
+        {showAgeTable && <AgeTable />}
       </div>
     </>
   );
-}
+};
 
 export default SearchDatabase;

@@ -49,3 +49,26 @@ export const fetchDataByAttributes = async (selectedRelation, selectedAttributes
     throw error;
   }
 };
+
+// fetch data for nested age query 
+export const fetchAgeQuery = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/ageQuery`);
+    console.log("response from server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error returning age query:', error);
+    throw error;
+  }
+};
+
+export const fetchMedalQuery = async (MedalType) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/medalCount/${MedalType}`);
+    console.log("response from server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error returning age query:', error);
+    throw error;
+  }
+};

@@ -92,7 +92,7 @@ router.get("/medalCount/:MedalType", (req, res) => {
   }
 
   const query = `
-    SELECT CountryName, count(a.PlayerId)
+    SELECT CountryName, count(a.PlayerId) AS Count
     FROM Athlete a, Medalist m
     WHERE MedalType = ? AND m.PlayerID = a.PlayerID
     GROUP BY CountryName
@@ -112,7 +112,7 @@ router.get("/medalCount/:MedalType", (req, res) => {
 //nested age agg
 router.get("/ageQuery", (req, res) => {
   const query = `
-    SELECT CountryName, min(a1.Age)
+    SELECT CountryName, min(a1.Age) AS Oldest
     FROM Athlete a1
     GROUP BY CountryName
     HAVING AVG(a1.Age) < (SELECT AVG(a2.Age)

@@ -9,8 +9,9 @@ function frontPage() {
           <header>
             <h1>Olympics Database Application</h1>
           </header>
-          <Link to ="/searchDatabase">Search Database    </Link>
-          <Link to ="/login">Manage Database</Link>
+          <Link to ="/manageDatabase">Manage Database</Link>
+          <Link to ="/searchDatabase">Search Database</Link>
+          <Link to ="/login">Login Page</Link>
         </div>
       );
 }

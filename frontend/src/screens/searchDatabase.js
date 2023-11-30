@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Olympics from "../olympics.png";
 import ResultsTable from "../components/resultsTable";
-import { fetchTables, fetchAttributesByRelation, fetchDataByAttributes } from "../services/searchDatabaseServices";
+import { fetchTables, fetchAttributesByRelation, fetchCountries } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
 import {Link} from 'react-router-dom';
 
@@ -11,7 +11,8 @@ function SearchDatabase() {
   const [selectedRelation, setSelectedRelation] = useState('');
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
-
+  const [countries, setAvailableCountries] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState('');
 
   useEffect(() => {
     fetchTables()
@@ -20,6 +21,15 @@ function SearchDatabase() {
         setRelations(tableNames);
       })
       .catch(error => console.error('Error fetching table names:', error));
+  }, []);
+
+  useEffect(() => {
+    fetchCountries()
+      .then(data => {
+        const countryNames = data.map(country => country.CountryName); // Use country.CountryName here
+        setAvailableCountries(countryNames);
+      })
+      .catch(error => console.error('Error fetching country names:', error));
   }, []);
 
   useEffect(() => {
@@ -37,6 +47,12 @@ function SearchDatabase() {
     const { value } = event.target;
     setSelectedRelation(value);
     setSelectedAttributes([]); // Reset selected attributes when relation changes
+    console.log(value);
+  };
+
+  const handleFilterChange = (event) => {
+    const { value } = event.target;
+    setSelectedFilter(value);
     console.log(value);
   };
 
@@ -112,8 +128,16 @@ function SearchDatabase() {
           medals per country
           <button className="Btn"> Search </button>
         </div>
-        <div className="show">
-          Show athletes with ... <button className="Btn"> Show </button>
+        <div className="searchBy">
+          Show athletes from:  
+          <select name="selectedCountry" value={selectedFilter} onChange={handleFilterChange}>
+            <option value="">Country</option>
+            {countries.map(country => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="show">aggregation with having query?</div>
         <div className="show">
@@ -122,7 +146,7 @@ function SearchDatabase() {
         </div>
         </div>
         )}
-        <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation}/>
+        <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}/>
       </div>
     </>
   );

@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { fetchDataByAttributes} from "../services/searchDatabaseServices";
+import { fetchByFilter, fetchDataByAttributes} from "../services/searchDatabaseServices";
 
-function ResultsTable({ selectedRelation, selectedAttributes }) {
+function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) {
   const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (selectedAttributes.length > 0) {
-          console.log(selectedAttributes)
-          console.log(selectedRelation)
-          const data = await fetchDataByAttributes(selectedRelation, selectedAttributes);
-          console.log('Fetched data:', data);
-          setTableData(data);
+          if (selectedFilter) {
+            console.log(selectedAttributes)
+            console.log(selectedRelation)
+            console.log(selectedFilter)
+            const data = await fetchByFilter(selectedRelation, selectedAttributes, selectedFilter);
+            console.log('Fetched data:', data);
+            setTableData(data);
+          } else {
+            console.log(selectedAttributes)
+            console.log(selectedRelation)
+            const data = await fetchDataByAttributes(selectedRelation, selectedAttributes);
+            console.log('Fetched data:', data);
+            setTableData(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -20,7 +29,7 @@ function ResultsTable({ selectedRelation, selectedAttributes }) {
     };
   
     fetchData();
-  }, [selectedRelation, selectedAttributes]);
+  }, [selectedRelation, selectedAttributes, selectedFilter]);
 
   useEffect(() => {
     console.log('tableData:', tableData);

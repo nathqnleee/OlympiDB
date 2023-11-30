@@ -8,7 +8,7 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) 
     const fetchData = async () => {
       try {
         if (selectedAttributes.length > 0) {
-          if (selectedFilter) {
+          if (selectedFilter.length > 0) {
             console.log(selectedAttributes)
             console.log(selectedRelation)
             console.log(selectedFilter)
@@ -26,7 +26,7 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) 
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    };
+  };
   
     fetchData();
   }, [selectedRelation, selectedAttributes, selectedFilter]);

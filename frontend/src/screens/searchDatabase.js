@@ -12,7 +12,7 @@ function SearchDatabase() {
   const [attributes, setAttributes] = useState([]);
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [countries, setAvailableCountries] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState([]);
 
   useEffect(() => {
     fetchTables()
@@ -51,7 +51,14 @@ function SearchDatabase() {
   };
 
   const handleFilterChange = (event) => {
-    const { value } = event.target;
+    const { name, value } = event.target;
+  
+    if (name === 'selectedCountry') {
+      if (value === '') {
+        setSelectedAttributes([]);
+      }
+    }
+
     setSelectedFilter(value);
     console.log(value);
   };
@@ -130,7 +137,16 @@ function SearchDatabase() {
         </div>
         <div className="searchBy">
           Show athletes from:  
-          <select name="selectedCountry" value={selectedFilter} onChange={handleFilterChange}>
+          <select name="selectedCountry1" value="" onChange={handleFilterChange}>
+            <option value="">Country</option>
+            {countries.map(country => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          or 
+          <select name="selectedCountry2" value="" onChange={handleFilterChange}>
             <option value="">Country</option>
             {countries.map(country => (
               <option key={country} value={country}>

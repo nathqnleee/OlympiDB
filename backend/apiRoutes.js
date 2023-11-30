@@ -189,6 +189,33 @@ router.post("/deleteAthlete", (req, res) => {
     }
   });
 });
+
+//join
+router.post('/joinMedalists', (req, res) => {
+  const { medalType, selectedAttributes } = req.body;
+  console.log(selectedAttributes)
+
+  if (!selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
+  }
+
+  const selectClause = selectedAttributes.join(', ');
+
+  const query = `
+    SELECT ${selectClause}
+    FROM Medalist m, Athlete a
+    WHERE a.PlayerID = m.PlayerID AND MedalType = ?`;
+
+  pool.query(query, [medalType], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 module.exports = router;
 
 router.post('/fetchData', (req, res) => {

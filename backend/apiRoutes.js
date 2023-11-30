@@ -216,7 +216,7 @@ router.post('/joinMedalists', (req, res) => {
   });
 });
 
-module.exports = router;
+
 
 router.post('/fetchData', (req, res) => {
   const { selectedRelation, selectedAttributes } = req.body;
@@ -274,3 +274,5 @@ router.post('/fetchByFilter', (req, res) => {
     }
   });
 });
+
+module.exports = router;

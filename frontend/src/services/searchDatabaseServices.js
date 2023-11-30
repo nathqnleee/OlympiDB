@@ -98,7 +98,6 @@ export const fetchAlthetesByMedal = async (medalType, selectedAttributes) => {
       medalType: medalType,
       selectedAttributes: selectedAttributes,
     };
-    console.log(requestBody)
 
     const response = await axios.post(`${API_BASE_URL}/joinMedalists`, requestBody, config);
 

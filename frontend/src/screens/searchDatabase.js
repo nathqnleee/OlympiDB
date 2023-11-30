@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Olympics from "../olympics.png";
 import ResultsTable from "../components/resultsTable";
-import { fetchTables, fetchAttributesByRelation, fetchCountries } from "../services/searchDatabaseServices";
+import { fetchTables, fetchAttributesByRelation, fetchCountries, fetchAlthetesByMedal } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
 import {Link} from 'react-router-dom';
 
@@ -81,15 +81,15 @@ function SearchDatabase() {
     setSelectedMedal(value);
   };
 
-  const handleJoinQuery = (event) => {
-    event.preventDefault();
-    console.log(selectedMedal)
-    fetchAlthetesByMedal(selectedMedal, selectedAttributes)
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {console.error('Error updating athlete:', error)});
-  };
+  // const handleJoinQuery = (event) => {
+  //   event.preventDefault();
+  //   console.log(selectedMedal)
+  //   fetchAlthetesByMedal(selectedMedal, selectedAttributes)
+  //     .then(response => {
+  //       console.log(response);
+  //     })
+  //     .catch(error => {console.error('Error updating athlete:', error)});
+  // };
 
   return (
     <>
@@ -138,18 +138,18 @@ function SearchDatabase() {
 
         {selectedRelation === "Athlete" && (
           <div>
-        <div className="show">
-          <label>
-            Show number of
-            <select className="select">
-              <option value="attribute"> Gold </option>
-              <option value="attribute"> Silver </option>
-              <option value="attribute"> Bronze </option>
-            </select>
-          </label>{" "}
-          medals per country
-          <button className="Btn"> Search </button>
-        </div>
+
+            <div className="show">
+                Show athletes who have won a  
+                <select id="medalTypeDropdown" name="selectedMedal" value={selectedMedal} onChange={handleMedalChange}>
+                  <option value="">Select Medal</option>
+                  <option value="gold">Gold</option>
+                  <option value="silver">Silver</option>
+                  <option value="bronze">Bronze</option>
+                </select> medal!
+              <button className="Btn"> Show </button>
+            </div>
+        <h3>OR</h3>
         <div className="countryCheckboxes">
         Filter By Country:
         {countries.map(country => (
@@ -163,6 +163,19 @@ function SearchDatabase() {
           </label>
           ))}
         </div>
+
+        <div className="show">
+          <label>
+            Show number of
+            <select className="select">
+              <option value="attribute"> Gold </option>
+              <option value="attribute"> Silver </option>
+              <option value="attribute"> Bronze </option>
+            </select>
+          </label>{" "}
+          medals per country
+          <button className="Btn"> Search </button>
+        </div>
         <div className="show">aggregation with having query?</div>
         <div className="show">
           Show athletes who have won all medal types{" "}
@@ -170,7 +183,8 @@ function SearchDatabase() {
         </div>
         </div>
         )}
-        <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}/>
+        <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}
+                    medalType={selectedMedal}/>
       </div>
     </>
   );

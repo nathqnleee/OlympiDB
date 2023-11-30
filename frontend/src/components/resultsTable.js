@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { fetchByFilter, fetchDataByAttributes} from "../services/searchDatabaseServices";
+import { fetchByFilter, fetchDataByAttributes, fetchAlthetesByMedal} from "../services/searchDatabaseServices";
 
-function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) {
+function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter, medalType }) {
   const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
           if (selectedFilter.length > 0) {
-            console.log(selectedAttributes)
-            console.log(selectedRelation)
-            console.log(selectedFilter)
+            console.log(medalType)
             const data = await fetchByFilter(selectedRelation, selectedAttributes, selectedFilter);
             console.log('Fetched data:', data);
             setTableData(data);
-          } else {
-            console.log(selectedAttributes)
-            console.log(selectedRelation)
+          } else if (medalType !== '') {
+            // get medalists
+            console.log(medalType)
+            const data = await  fetchAlthetesByMedal(medalType, selectedAttributes);
+            console.log('Fetched data:', data);
+            setTableData(data);
+          }else {
             const data = await fetchDataByAttributes(selectedRelation, selectedAttributes);
             console.log('Fetched data:', data);
             setTableData(data);
@@ -27,7 +29,7 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) 
   };
   
     fetchData();
-  }, [selectedRelation, selectedAttributes, selectedFilter]);
+  }, [selectedRelation, selectedAttributes, selectedFilter, medalType]);
 
   useEffect(() => {
     console.log('tableData:', tableData);

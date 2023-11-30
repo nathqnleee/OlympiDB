@@ -193,13 +193,14 @@ router.post("/deleteAthlete", (req, res) => {
 //join
 router.post('/joinMedalists', (req, res) => {
   const { medalType, selectedAttributes } = req.body;
-  console.log(selectedAttributes)
+  console.log(medalType)
 
-  if (!selectedAttributes || !Array.isArray(selectedAttributes)) {
+  if (!medalType || !selectedAttributes || !Array.isArray(selectedAttributes)) {
     return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
   }
 
-  const selectClause = selectedAttributes.join(', ');
+  const selectClause = selectedAttributes.map(attribute => `a.${attribute}`).join(', ');
+  console.log(selectClause)
 
   const query = `
     SELECT ${selectClause}

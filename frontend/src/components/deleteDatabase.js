@@ -7,6 +7,8 @@ function DeleteDatabase() {
     const [athleteData, setAthleteData] = useState({
         PlayerID: ''
       });
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     // Fetch the athletes from the database
     useEffect(() => {
@@ -40,16 +42,29 @@ function DeleteDatabase() {
 
     const handleDeleteAthlete = (event) => {
         event.preventDefault();
+
+          // Basic validation
+          if (
+            athleteData.PlayerID.trim() === ''
+        ) {
+            setErrorMessage('Please select an athlete to delete.');
+            return;
+        }
         deleteAthlete(athleteData)
           .then(response => {
             console.log(response);
+            setSuccessMessage('Athlete deleted successfully!');
           })
-          .catch(error => console.error('Error deleting athlete:', error));
+          .catch(error => {console.error('Error deleting athlete:', error)
+          setSuccessMessage('Error deleting athlete! Please try again');
+        });
       };
 
     return (
       <div className="updateDatabasePage">
         <h1>Delete Athlete</h1>
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       <form onSubmit={handleDeleteAthlete}>
       <label>
             Delete Athlete by Name:

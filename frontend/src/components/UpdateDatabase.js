@@ -14,6 +14,8 @@ function UpdateDatabase() {
         PlayerID: ''
       });
 
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     // Fetch the athletes from the database
     useEffect(() => {
         fetchAthletes()
@@ -77,16 +79,31 @@ function UpdateDatabase() {
     
       const handleUpdateAthlete = (event) => {
         event.preventDefault();
+
+          // Basic validation
+          if (
+            athleteData.CountryName.trim() === '' ||
+            athleteData.Age === 0 ||
+            athleteData.PlayerID.trim() === '' ||
+            athleteData.CoachID.trim() === ''
+        ) {
+            setErrorMessage('Please fill in all the required fields.');
+            return;
+        }
         updateAthlete(athleteData)
           .then(response => {
             console.log(response);
+            setSuccessMessage('Athlete updated successfully!');
           })
-          .catch(error => console.error('Error updating athlete:', error));
+          .catch(error => {console.error('Error updating athlete:', error)
+          setSuccessMessage('Error updating athlete! Please try again');});
       };
 
     return (
       <div className="updateDatabasePage">
         <h1>Update Athlete</h1>
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       <form onSubmit={handleUpdateAthlete}>
       <label>
       Update Record of Athlete: 

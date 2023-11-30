@@ -50,18 +50,14 @@ function SearchDatabase() {
     console.log(value);
   };
 
-  const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-  
-    if (name === 'selectedCountry') {
-      if (value === '') {
-        setSelectedAttributes([]);
-      }
+  const handleCheckBoxChangeFilter = (country) => {
+    const isChecked = selectedFilter.includes(country);
+    if (isChecked) {
+      setSelectedFilter(selectedFilter.filter(item => item !== country));
+    } else {
+      setSelectedFilter([...selectedFilter, country]);
     }
-
-    setSelectedFilter(value);
-    console.log(value);
-  };
+  };  
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -135,25 +131,18 @@ function SearchDatabase() {
           medals per country
           <button className="Btn"> Search </button>
         </div>
-        <div className="searchBy">
-          Show athletes from:  
-          <select name="selectedCountry1" value="" onChange={handleFilterChange}>
-            <option value="">Country</option>
-            {countries.map(country => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
-          </select>
-          or 
-          <select name="selectedCountry2" value="" onChange={handleFilterChange}>
-            <option value="">Country</option>
-            {countries.map(country => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
-          </select>
+        <div className="countryCheckboxes">
+        Filter By Country:
+        {countries.map(country => (
+          <label key={country}>
+            <input
+              type="checkbox"
+              checked={selectedFilter.includes(country)}
+              onChange={() => handleCheckBoxChangeFilter(country)}
+            />
+            {country}
+          </label>
+          ))}
         </div>
         <div className="show">aggregation with having query?</div>
         <div className="show">

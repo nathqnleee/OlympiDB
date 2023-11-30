@@ -3,61 +3,6 @@ const express = require("express");
 const router = express.Router();
 const pool = require("./db");
 
-router.post('/fetchData', (req, res) => {
-  const { selectedRelation, selectedAttributes } = req.body;
-  console.log(selectedAttributes)
-
-  if (!selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
-    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
-  }
-
-  // Create the SELECT clause based on the selected attributes
-  const selectClause = selectedAttributes.join(', ');
-
-  // Construct the query
-  const query = `
-    SELECT ${selectClause}
-    FROM ${selectedRelation}, 
-  `;
-
-  pool.query(query, (error, results) => {
-    if (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Error fetching data from the database' });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
-router.post('/fetchByFilter', (req, res) => {
-  const { selectedRelation, selectedAttributes, selectedFilter } = req.body;
-  console.log(selectedFilter)
-
-  if (!selectedFilter || !selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
-    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
-  }
-
-  // Create the SELECT clause based on the selected attributes
-  const selectClause = selectedAttributes.join(', ');
-
-  // Construct the query
-  const query = `
-    SELECT ${selectClause}
-    FROM ${selectedRelation}
-    WHERE CountryName = ?
-  `;
-
-  pool.query(query, [selectedFilter], (error, results) => {
-    if (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Error fetching data from the database' });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
 router.get("/tables", (req, res) => {
   pool.query("SHOW tables", (error, results) => {
     if (error) {
@@ -245,3 +190,63 @@ router.post("/deleteAthlete", (req, res) => {
   });
 });
 module.exports = router;
+
+router.post('/fetchData', (req, res) => {
+  const { selectedRelation, selectedAttributes } = req.body;
+  console.log(selectedAttributes)
+
+  if (!selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
+  }
+
+  // Create the SELECT clause based on the selected attributes
+  const selectClause = selectedAttributes.join(', ');
+
+  // Construct the query
+  const query = `
+    SELECT ${selectClause}
+    FROM ${selectedRelation}, 
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+router.post('/fetchByFilter', (req, res) => {
+  const { selectedRelation, selectedAttributes, selectedFilter } = req.body;
+
+  if (!selectedFilter || !selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
+  }
+
+  // Create the SELECT clause based on the selected attributes
+  const selectClause = selectedAttributes.join(', ');
+
+  // Create an array of placeholders for the IN clause
+  const placeholders = selectedFilter.map(() => '?').join(', ');
+
+  // Create the WHERE clause with multiple OR conditions
+  const whereClause = selectedFilter.map(() => 'CountryName = ?').join(' OR ');
+
+  // Construct the query dynamically
+  const query = `
+    SELECT ${selectClause}
+    FROM ${selectedRelation}
+    WHERE ${whereClause}
+  `;
+
+  pool.query(query, selectedFilter, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
+});

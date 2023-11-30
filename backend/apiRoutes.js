@@ -205,7 +205,7 @@ router.post('/fetchData', (req, res) => {
   // Construct the query
   const query = `
     SELECT ${selectClause}
-    FROM ${selectedRelation}, 
+    FROM ${selectedRelation}
   `;
 
   pool.query(query, (error, results) => {
@@ -227,9 +227,6 @@ router.post('/fetchByFilter', (req, res) => {
 
   // Create the SELECT clause based on the selected attributes
   const selectClause = selectedAttributes.join(', ');
-
-  // Create an array of placeholders for the IN clause
-  const placeholders = selectedFilter.map(() => '?').join(', ');
 
   // Create the WHERE clause with multiple OR conditions
   const whereClause = selectedFilter.map(() => 'CountryName = ?').join(' OR ');

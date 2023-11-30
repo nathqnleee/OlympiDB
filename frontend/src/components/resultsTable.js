@@ -7,7 +7,6 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (selectedAttributes.length > 0) {
           if (selectedFilter.length > 0) {
             console.log(selectedAttributes)
             console.log(selectedRelation)
@@ -22,7 +21,6 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter }) 
             console.log('Fetched data:', data);
             setTableData(data);
           }
-        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }

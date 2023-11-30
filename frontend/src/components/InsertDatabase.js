@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchCountries, fetchCoachesByCountry, insertAthlete } from '../services/updateDatabaseServices';
+import {Link} from 'react-router-dom';
 
 function InsertDatabase() {
     const [countries, setCountries] = useState([]);
@@ -13,6 +14,9 @@ function InsertDatabase() {
         CountryName: '',
         CoachID: '',
       });
+
+      const [successMessage, setSuccessMessage] = useState('');
+      const [errorMessage, setErrorMessage] = useState('');
 
     // Fetch countries from the API and update the state
     useEffect(() => {
@@ -55,18 +59,39 @@ function InsertDatabase() {
     
       const handleInsertAthlete = (event) => {
         event.preventDefault();
+
+          // Basic validation
+          if (
+            athleteData.FirstName.trim() === '' ||
+            athleteData.LastName.trim() === '' ||
+            athleteData.Age === 0 ||
+            athleteData.Gender.trim() === '' ||
+            selectedCountry.trim() === '' ||
+            athleteData.CoachID.trim() === ''
+        ) {
+            setErrorMessage('Please fill in all the required fields.');
+            return;
+        }
+
         insertAthlete(athleteData)
-          .then(response => {
-            console.log(response);
-            // Additional logic after successful insertion, if needed
-          })
-          .catch(error => console.error('Error inserting athlete:', error));
-      };
+            .then(response => {
+                console.log(response);
+                setSuccessMessage('Athlete inserted successfully!');
+                // Additional logic after successful insertion, if needed
+            })
+            .catch(error => {
+                console.error('Error inserting athlete:', error);
+                setSuccessMessage('Error inserting athlete. Please try again.');
+            });
+    };
     
   
     return (
       <div className="updateDatabasePage">
+        <Link to ="/searchDatabase">Search Database</Link>
         <h1>Insert Athlete</h1>
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
             <form onSubmit={handleInsertAthlete}>
             <label>
                 First Name:
@@ -132,61 +157,6 @@ function InsertDatabase() {
             </label>
             <input type="submit" value="Insert" />
             </form>
-        
-        {/* <h1>Update Athlete</h1>
-      <form>
-      <label>
-                First Name:
-                <input
-                type="text"
-                name="FirstName"  // Make sure the name matches the corresponding key in athleteData
-                />
-            </label>
-            <label>
-                Last Name:
-                <input
-                type="text"
-                name="LastName"
-                />
-            </label>
-            <label>
-                Age:
-                <input
-                type="number"
-                name="Age"
-                />
-            </label>
-            <label>
-                Gender:
-                <input
-                type="text"
-                name="Gender"
-                />
-            </label>
-            <label>
-            Country:
-            <select name="selectedCountry">
-                <option value="">Select a country</option>
-            </select>
-            </label>
-            <label>
-                Coach:
-                <select
-                    name="CoachID"
-                    >
-                    <option value="">Select a coach</option>
-                    </select>
-            </label>
-          <input type="submit" value="Update" />
-        </form>
-      <h1>Delete Athlete Using PlayerID</h1>
-        <form>
-            <label>
-              PlayerID:
-              <input type="text" name="PlayerID" />
-            </label>
-            <input type="submit" value="Delete" />
-          </form> */}
        </div>
     );
   }

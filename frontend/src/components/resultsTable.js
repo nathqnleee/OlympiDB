@@ -3,37 +3,45 @@ import { fetchByFilter, fetchAgeQuery, fetchDataByAttributes, fetchAlthetesByMed
 
 function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter, medalType }) {
   const [tableData, setTableData] = useState([]);
+  const [displayAttributes, setDisplayAttributes] = useState(selectedAttributes);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-          if (selectedFilter.length > 0) {
-            console.log(medalType)
-            const data = await fetchByFilter(selectedRelation, selectedAttributes, selectedFilter);
-            console.log('Fetched data:', data);
-            setTableData(data);
-          } else if (medalType !== '') {
-            // get medalists
-            console.log(medalType)
-            const data = await  fetchAlthetesByMedal(medalType, selectedAttributes);
-            console.log('Fetched data:', data);
-            setTableData(data);
-          }else {
-            const data = await fetchDataByAttributes(selectedRelation, selectedAttributes);
-            console.log('Fetched data:', data);
-            setTableData(data);
-          }
+        if (selectedFilter.length > 0) {
+          console.log(medalType);
+          const data = await fetchByFilter(selectedRelation, selectedAttributes, selectedFilter);
+          console.log('Fetched data:', data);
+          setTableData(data);
+          setDisplayAttributes(selectedAttributes);
+        } else if (medalType !== '') {
+          // get medalists
+          console.log(medalType);
+          const data = await fetchAlthetesByMedal(medalType, selectedAttributes);
+          console.log('Fetched data:', data);
+
+          // Update displayAttributes to include MedalType
+          setDisplayAttributes([...selectedAttributes, 'MedalType']);
+
+          setTableData(data);
+        } else {
+          const data = await fetchDataByAttributes(selectedRelation, selectedAttributes);
+          console.log('Fetched data:', data);
+          setTableData(data);
+          setDisplayAttributes(selectedAttributes);
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
       }
-  };
-  
+    };
+
     fetchData();
   }, [selectedRelation, selectedAttributes, selectedFilter, medalType]);
 
   useEffect(() => {
     console.log('tableData:', tableData);
-  }, [tableData]);
+    console.log('displayAttributes:', displayAttributes);
+  }, [tableData, displayAttributes]);
 
   return (
     <div className="tableContainer">
@@ -41,7 +49,8 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter, me
       <table className="table">
         <thead>
           <tr>
-            {selectedAttributes.map((attribute) => (
+            {console.log(displayAttributes)}
+            {displayAttributes.map((attribute) => (
               <th key={attribute}>{attribute}</th>
             ))}
           </tr>
@@ -49,7 +58,7 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter, me
         <tbody>
           {tableData.map((rowData, index) => (
             <tr key={index}>
-              {selectedAttributes.map((attribute) => (
+              {displayAttributes.map((attribute) => (
                 <td key={attribute}>{rowData[attribute]}</td>
               ))}
             </tr>

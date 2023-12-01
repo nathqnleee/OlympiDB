@@ -150,16 +150,7 @@ function SearchDatabase() {
           <img src={Olympics} alt="Olympics Logo" />
         </div>
         <Link to ="/login">Manage Database</Link>
-        <div className="inputBoxContainer">
-          <input
-            className="inputBox"
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder="Search Olympic Data"
-          />
-          <button className="Btn"> Search </button>
-        </div>
+       <h2></h2>
         <div className="searchBy">
           <label>
             Search by:
@@ -199,7 +190,6 @@ function SearchDatabase() {
                   <option value="silver">Silver</option>
                   <option value="bronze">Bronze</option>
                 </select> medal!
-              <button className="Btn"> Show </button>
               <p>OR</p>
             </div>
         
@@ -227,7 +217,6 @@ function SearchDatabase() {
             </select>
           </label>{" "}
           medals per country
-          <button className="Btn"> Search </button>
         </div>
         <div className="show">
           Show youngest athletes for countries with avg. athlete

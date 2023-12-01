@@ -37,7 +37,7 @@ function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter, me
 
   return (
     <div className="tableContainer">
-      <h3> Show results </h3>
+      <h3> Database Results </h3>
       <table className="table">
         <thead>
           <tr>

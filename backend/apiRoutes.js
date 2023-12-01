@@ -304,6 +304,46 @@ router.post('/fetchByFilter', (req, res) => {
   });
 });
 
+router.get("/countryMedalQuery", (req, res) => {
+  const query = `
+  SELECT CountryName
+  FROM Country C
+  WHERE EXISTS (
+      SELECT 1
+      FROM Medalist M
+      WHERE M.PlayerID IN (
+          SELECT A.PlayerID
+          FROM Athlete A
+          WHERE A.CountryName = C.CountryName
+      ) AND M.MedalType = 'Bronze'
+  ) AND EXISTS (
+      SELECT 1
+      FROM Medalist M
+      WHERE M.PlayerID IN (
+          SELECT A.PlayerID
+          FROM Athlete A
+          WHERE A.CountryName = C.CountryName
+      ) AND M.MedalType = 'Silver'
+  ) AND EXISTS (
+      SELECT 1
+      FROM Medalist M
+      WHERE M.PlayerID IN (
+          SELECT A.PlayerID
+          FROM Athlete A
+          WHERE A.CountryName = C.CountryName
+      ) AND M.MedalType = 'Gold'
+  );
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Error fetching data from the database");
+    } else {
+      res.json(results);
+    }
+  });
+});
 
 
 module.exports = router;

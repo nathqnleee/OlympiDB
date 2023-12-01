@@ -142,3 +142,15 @@ export const fetchGenderQuery = async () => {
     throw error;
   }
 };
+
+export const fetchCountryMedalQuery = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/countryMedalQuery`);
+    console.log("response from server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error returning country medal query:', error);
+    throw error;
+  }
+};
+

@@ -4,7 +4,8 @@ import ResultsTable from "../components/resultsTable";
 import AgeTable from "../components/ageTable";
 import MedalTable from "../components/medalTable";
 import GenderTable from "../components/genderTable";
-import { fetchTables, fetchAttributesByRelation, fetchCountries, fetchAlthetesByMedal, fetchAgeQuery, fetchMedalQuery, fetchGenderQuery } from "../services/searchDatabaseServices";
+import CountryMedalTable from "../components/countryMedalTable";
+import { fetchTables, fetchAttributesByRelation, fetchCountries, fetchAlthetesByMedal, fetchAgeQuery, fetchMedalQuery, fetchGenderQuery, fetchCountryMedalQuery } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
 import {Link} from 'react-router-dom';
 
@@ -20,6 +21,7 @@ function SearchDatabase() {
   const [showAgeTable, setShowAgeTable] = useState(false);
   const [showMedalTable, setShowMedalTable] = useState(false);
   const [showGenderTable, setShowGenderTable] = useState(false);
+  const [showMedalistCountryTable, setMedalistCountry] = useState(false);
 
 
     //join
@@ -99,7 +101,7 @@ function SearchDatabase() {
     setSelectedMedal(value);
     // setSelectedAttributes([]); // Reset selected attributes when relation changes
     console.log(value);
-  };
+  }; 
 
   const handleShowYoungest = (event)  => {
     // const ydata = fetchAgeQuery();
@@ -110,6 +112,7 @@ function SearchDatabase() {
       setShowAgeTable(true)
       setShowMedalTable(false)
       setShowGenderTable(false)
+      setMedalistCountry(false)
     } catch (error) {
       console.error('Error fetching data:', error);
       setShowAgeTable(false)
@@ -124,6 +127,7 @@ function SearchDatabase() {
           setShowMedalTable(true)
           setShowAgeTable(false)
           setShowGenderTable(false)
+          setMedalistCountry(false)
         })
         .catch(error => console.error('Error fetching medals:', error));
         setShowMedalTable(false)
@@ -138,11 +142,23 @@ function SearchDatabase() {
       setShowAgeTable(false)
       setShowMedalTable(false)
       setShowGenderTable(true)
+      setMedalistCountry(false)
     } catch (error) {
       console.error('Error fetching data:', error);
      setShowGenderTable(false)
     }
   }
+
+  const handleShowCountryMedal = (event) => {
+    const data = fetchCountryMedalQuery()
+    setSelectedAttributes([])
+    setShowAgeTable(false)
+    setShowMedalTable(false)
+    setShowGenderTable(false)
+    setMedalistCountry(true)
+    console.log(data);
+  };
+
   return (
     <>
       <div className="search">
@@ -238,19 +254,19 @@ function SearchDatabase() {
         <div className="show">Show countries that have more female gold medalists than male gold medalists
         <button className="Btn" onClick={handleShowGender}> Show </button>
          </div>
-        <div className="show">aggregation with having query?</div>
         <div className="show">
-          Show athletes who have won all medal types{" "}
-          <button className="Btn"> Show </button>
+          Show athletes who have won all medal types
+          <button className="Btn" onClick={handleShowCountryMedal}> Show </button>
         </div>
         </div>
         )}
         
-        {!showMedalTable && !showAgeTable && !showGenderTable && <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}
+        {!showMedalTable && !showAgeTable && !showGenderTable && !showMedalistCountryTable && <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}
                     medalType={medalType}/>}
         {showMedalTable && <MedalTable selectedMedal={selectedMedal} />}
         {showAgeTable && <AgeTable />}
         {showGenderTable && <GenderTable />}
+        {showMedalistCountryTable && <CountryMedalTable />}
       </div>
     </>
   );

@@ -3,33 +3,6 @@ const express = require("express");
 const router = express.Router();
 const pool = require("./db");
 
-router.post('/fetchData', (req, res) => {
-  const { selectedRelation, selectedAttributes } = req.body;
-  console.log(selectedAttributes)
-
-  if (!selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
-    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
-  }
-
-  // Create the SELECT clause based on the selected attributes
-  const selectClause = selectedAttributes.join(', ');
-
-  // Construct the query
-  const query = `
-    SELECT ${selectClause}
-    FROM ${selectedRelation}
-  `;
-
-  pool.query(query, (error, results) => {
-    if (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Error fetching data from the database' });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
 router.get("/tables", (req, res) => {
   pool.query("SHOW tables", (error, results) => {
     if (error) {
@@ -92,7 +65,7 @@ router.get("/medalCount/:MedalType", (req, res) => {
   }
 
   const query = `
-    SELECT CountryName, count(a.PlayerId)
+    SELECT CountryName, count(a.PlayerId) AS Count
     FROM Athlete a, Medalist m
     WHERE MedalType = ? AND m.PlayerID = a.PlayerID
     GROUP BY CountryName
@@ -112,11 +85,39 @@ router.get("/medalCount/:MedalType", (req, res) => {
 //nested age agg
 router.get("/ageQuery", (req, res) => {
   const query = `
-    SELECT CountryName, min(a1.Age)
+    SELECT CountryName, min(a1.Age) AS Oldest
     FROM Athlete a1
     GROUP BY CountryName
     HAVING AVG(a1.Age) < (SELECT AVG(a2.Age)
                     FROM Athlete a2)
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Error fetching data from the database");
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// aggregation with having
+router.get("/genderQuery", (req, res) => {
+  const query = `
+  SELECT CountryName, Gender, COUNT(a.PlayerId) AS GenderCount
+  FROM Athlete a, Medalist m
+  WHERE Gender = 'Female' AND MedalType = 'Gold' AND m.PlayerID = a.PlayerId
+  GROUP BY CountryName, Gender
+  HAVING GenderCount > IFNULL(
+      (
+          SELECT COUNT(a2.PlayerId) 
+          FROM Athlete a2, Medalist m2
+          WHERE Gender = 'Male' AND MedalType = 'Gold' AND a.CountryName = a2.CountryName AND m2.PlayerID = a2.PlayerId
+          GROUP BY a2.CountryName, a2.Gender
+      ),
+      0
+  )
   `;
 
   pool.query(query, (error, results) => {
@@ -216,4 +217,93 @@ router.post("/deleteAthlete", (req, res) => {
     }
   });
 });
+
+//join
+router.post('/joinMedalists', (req, res) => {
+  const { medalType, selectedAttributes } = req.body;
+  console.log(medalType)
+
+  if (!medalType || !selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
+  }
+
+  const selectClause = selectedAttributes.map(attribute => `a.${attribute}`).join(', ');
+  console.log(selectClause)
+
+  const query = `
+    SELECT ${selectClause}
+    FROM Medalist m, Athlete a
+    WHERE a.PlayerID = m.PlayerID AND MedalType = ?`;
+
+  pool.query(query, [medalType], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+
+
+router.post('/fetchData', (req, res) => {
+  const { selectedRelation, selectedAttributes } = req.body;
+  console.log(selectedAttributes)
+
+  if (!selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
+  }
+
+  // Create the SELECT clause based on the selected attributes
+  const selectClause = selectedAttributes.join(', ');
+
+  // Construct the query
+  const query = `
+    SELECT ${selectClause}
+    FROM ${selectedRelation}
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+router.post('/fetchByFilter', (req, res) => {
+  const { selectedRelation, selectedAttributes, selectedFilter } = req.body;
+
+  if (!selectedFilter || !selectedRelation || !selectedAttributes || !Array.isArray(selectedAttributes)) {
+    return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
+  }
+
+  // Create the SELECT clause based on the selected attributes
+  const selectClause = selectedAttributes.join(', ');
+
+  // Create the WHERE clause with multiple OR conditions
+  const whereClause = selectedFilter.map(() => 'CountryName = ?').join(' OR ');
+
+  // Construct the query dynamically
+  const query = `
+    SELECT ${selectClause}
+    FROM ${selectedRelation}
+    WHERE ${whereClause}
+  `;
+
+  pool.query(query, selectedFilter, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error fetching data from the database' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+
+
 module.exports = router;

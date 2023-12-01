@@ -65,7 +65,7 @@ router.get("/medalCount/:MedalType", (req, res) => {
   }
 
   const query = `
-    SELECT CountryName, count(a.PlayerId)
+    SELECT CountryName, count(a.PlayerId) AS Count
     FROM Athlete a, Medalist m
     WHERE MedalType = ? AND m.PlayerID = a.PlayerID
     GROUP BY CountryName
@@ -85,11 +85,39 @@ router.get("/medalCount/:MedalType", (req, res) => {
 //nested age agg
 router.get("/ageQuery", (req, res) => {
   const query = `
-    SELECT CountryName, min(a1.Age)
+    SELECT CountryName, min(a1.Age) AS Oldest
     FROM Athlete a1
     GROUP BY CountryName
     HAVING AVG(a1.Age) < (SELECT AVG(a2.Age)
                     FROM Athlete a2)
+  `;
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Error fetching data from the database");
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// aggregation with having
+router.get("/genderQuery", (req, res) => {
+  const query = `
+  SELECT CountryName, Gender, COUNT(a.PlayerId) AS GenderCount
+  FROM Athlete a, Medalist m
+  WHERE Gender = 'Female' AND MedalType = 'Gold' AND m.PlayerID = a.PlayerId
+  GROUP BY CountryName, Gender
+  HAVING GenderCount > IFNULL(
+      (
+          SELECT COUNT(a2.PlayerId) 
+          FROM Athlete a2, Medalist m2
+          WHERE Gender = 'Male' AND MedalType = 'Gold' AND a.CountryName = a2.CountryName AND m2.PlayerID = a2.PlayerId
+          GROUP BY a2.CountryName, a2.Gender
+      ),
+      0
+  )
   `;
 
   pool.query(query, (error, results) => {
@@ -275,5 +303,7 @@ router.post('/fetchByFilter', (req, res) => {
     }
   });
 });
+
+
 
 module.exports = router;

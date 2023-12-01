@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchByFilter, fetchDataByAttributes, fetchAlthetesByMedal} from "../services/searchDatabaseServices";
+import { fetchByFilter, fetchAgeQuery, fetchDataByAttributes, fetchAlthetesByMedal} from "../services/searchDatabaseServices";
 
 function ResultsTable({ selectedRelation, selectedAttributes, selectedFilter, medalType }) {
   const [tableData, setTableData] = useState([]);

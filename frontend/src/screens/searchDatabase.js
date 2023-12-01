@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Olympics from "../olympics.png";
 import ResultsTable from "../components/resultsTable";
-import { fetchTables, fetchAttributesByRelation, fetchCountries, fetchAlthetesByMedal } from "../services/searchDatabaseServices";
+import AgeTable from "../components/ageTable";
+import MedalTable from "../components/medalTable";
+import GenderTable from "../components/genderTable";
+import { fetchTables, fetchAttributesByRelation, fetchCountries, fetchAlthetesByMedal, fetchAgeQuery, fetchMedalQuery, fetchGenderQuery } from "../services/searchDatabaseServices";
 import "./searchDatabase.css";
 import {Link} from 'react-router-dom';
 
@@ -13,9 +16,14 @@ function SearchDatabase() {
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [countries, setAvailableCountries] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState([]);
+  const [selectedMedal, setSelectedMedal] = useState('')
+  const [showAgeTable, setShowAgeTable] = useState(false);
+  const [showMedalTable, setShowMedalTable] = useState(false);
+  const [showGenderTable, setShowGenderTable] = useState(false);
+
 
     //join
-    const [selectedMedal, setSelectedMedal] = useState('');
+    const [medalType, setMedalType] = useState('');
 
   useEffect(() => {
     fetchTables()
@@ -60,6 +68,8 @@ function SearchDatabase() {
     } else {
       setSelectedFilter([...selectedFilter, country]);
     }
+    setShowAgeTable(false)
+    setShowMedalTable(false)
   };  
 
   const handleInputChange = (e) => {
@@ -68,6 +78,9 @@ function SearchDatabase() {
 
   const handleCheckboxChange = (attribute) => {
     const isChecked = selectedAttributes.includes(attribute);
+    setShowAgeTable(false)
+    setShowMedalTable(false)
+    setShowGenderTable(false)
     if (isChecked) {
       setSelectedAttributes(selectedAttributes.filter(item => item !== attribute));
     } else {
@@ -78,19 +91,58 @@ function SearchDatabase() {
   //join methods
   const handleMedalChange = (event) => {
     const { value } = event.target;
-    setSelectedMedal(value);
+    setMedalType(value);
   };
 
-  // const handleJoinQuery = (event) => {
-  //   event.preventDefault();
-  //   console.log(selectedMedal)
-  //   fetchAlthetesByMedal(selectedMedal, selectedAttributes)
-  //     .then(response => {
-  //       console.log(response);
-  //     })
-  //     .catch(error => {console.error('Error updating athlete:', error)});
-  // };
+  const handleShowMedal = (event) => {
+    const { value } = event.target;
+    setSelectedMedal(value);
+    // setSelectedAttributes([]); // Reset selected attributes when relation changes
+    console.log(value);
+  };
 
+  const handleShowYoungest = (event)  => {
+    // const ydata = fetchAgeQuery();
+    try {
+      const data = fetchAgeQuery()
+      console.log("query:", data)
+      setSelectedAttributes([])
+      setShowAgeTable(true)
+      setShowMedalTable(false)
+      setShowGenderTable(false)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setShowAgeTable(false)
+    }
+  };
+
+  useEffect(() => {
+    if (selectedMedal) {
+      fetchMedalQuery(selectedMedal)
+        .then(data => {
+          console.log('query:', data)
+          setShowMedalTable(true)
+          setShowAgeTable(false)
+          setShowGenderTable(false)
+        })
+        .catch(error => console.error('Error fetching medals:', error));
+        setShowMedalTable(false)
+    }
+  }, [selectedMedal]);
+
+  const handleShowGender = (event) => {
+    try {
+      const data = fetchGenderQuery()
+      console.log("query:", data)
+      setSelectedAttributes([])
+      setShowAgeTable(false)
+      setShowMedalTable(false)
+      setShowGenderTable(true)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+     setShowGenderTable(false)
+    }
+  }
   return (
     <>
       <div className="search">
@@ -141,15 +193,16 @@ function SearchDatabase() {
 
             <div className="show">
                 Show athletes who have won a  
-                <select id="medalTypeDropdown" name="selectedMedal" value={selectedMedal} onChange={handleMedalChange}>
+                <select id="medalTypeDropdown" name="selectedMedal" value={medalType} onChange={handleMedalChange}>
                   <option value="">Select Medal</option>
                   <option value="gold">Gold</option>
                   <option value="silver">Silver</option>
                   <option value="bronze">Bronze</option>
                 </select> medal!
               <button className="Btn"> Show </button>
+              <p>OR</p>
             </div>
-        <h3>OR</h3>
+        
         <div className="countryCheckboxes">
         Filter By Country:
         {countries.map(country => (
@@ -163,19 +216,28 @@ function SearchDatabase() {
           </label>
           ))}
         </div>
-
+          <h2> Other Queries To Explore:</h2>
         <div className="show">
           <label>
             Show number of
-            <select className="select">
-              <option value="attribute"> Gold </option>
-              <option value="attribute"> Silver </option>
-              <option value="attribute"> Bronze </option>
+            <select className="select" value={selectedMedal} onChange={handleShowMedal}>
+              <option value="Gold"> Gold </option>
+              <option value="Silver"> Silver </option>
+              <option value="Bronze"> Bronze </option>
             </select>
           </label>{" "}
           medals per country
           <button className="Btn"> Search </button>
         </div>
+        <div className="show">
+          Show youngest athletes for countries with avg. athlete
+           age that is lower than average athlete age over
+            all countries 
+            <button className="Btn" onClick={handleShowYoungest}> Show </button>
+        </div>
+        <div className="show">Show countries that have more female gold medalists than male gold medalists
+        <button className="Btn" onClick={handleShowGender}> Show </button>
+         </div>
         <div className="show">aggregation with having query?</div>
         <div className="show">
           Show athletes who have won all medal types{" "}
@@ -183,11 +245,15 @@ function SearchDatabase() {
         </div>
         </div>
         )}
-        <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}
-                    medalType={selectedMedal}/>
+        
+        {!showMedalTable && !showAgeTable && !showGenderTable && <ResultsTable selectedAttributes={selectedAttributes} selectedRelation={selectedRelation} selectedFilter={selectedFilter}
+                    medalType={medalType}/>}
+        {showMedalTable && <MedalTable selectedMedal={selectedMedal} />}
+        {showAgeTable && <AgeTable />}
+        {showGenderTable && <GenderTable />}
       </div>
     </>
   );
-}
+};
 
 export default SearchDatabase;

@@ -67,6 +67,7 @@
   width: 800px;
   height: 200px;
   border-collapse: collapse;
+  margin-bottom: 100px;
 }
 
 th {

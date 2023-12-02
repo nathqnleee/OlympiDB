@@ -227,8 +227,16 @@ router.post('/joinMedalists', (req, res) => {
     return res.status(400).json({ error: 'Invalid or missing parameters in the request body' });
   }
 
-  const selectClause = selectedAttributes.map(attribute => `a.${attribute}`).join(', ');
-  console.log(selectClause)
+  selectedAttributes.push('MedalType');
+
+  const selectClause = selectedAttributes.map(attribute => {
+    if (attribute === 'MedalType') {
+      return `m.${attribute}`;
+    } else {
+      return `a.${attribute}`;
+    }
+  }).join(', ');
+
 
   const query = `
     SELECT ${selectClause}

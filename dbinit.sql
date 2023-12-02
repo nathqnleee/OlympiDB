@@ -1,4 +1,18 @@
-USE `olympics`;
+DROP TABLE IF EXISTS Part_of;
+DROP TABLE IF EXISTS Competes_in;
+DROP TABLE IF EXISTS ReturningAthlete;
+DROP TABLE IF EXISTS Medalist;
+DROP TABLE IF EXISTS Athlete;
+DROP TABLE IF EXISTS Event;
+DROP TABLE IF EXISTS Sport_Fed;
+DROP TABLE IF EXISTS Sport_Location;
+DROP TABLE IF EXISTS Sport_Season;
+DROP TABLE IF EXISTS Coach;
+DROP TABLE IF EXISTS Country;
+DROP TABLE IF EXISTS Venue;
+DROP TABLE IF EXISTS Federation;
+DROP TABLE IF EXISTS Team;
+
 
 CREATE TABLE Team
 (
@@ -71,7 +85,7 @@ CREATE TABLE Event
   StartTime TIMESTAMP NOT NULL,
   PRIMARY KEY (EventName, SportName),
   UNIQUE (VenueName, VenueCity, StartTime),
-  FOREIGN KEY (SportName) REFERENCES Sport_Season(SportName) ON DELETE CASCADE , 
+  FOREIGN KEY (SportName) REFERENCES Sport_Season(SportName) ON DELETE CASCADE, 
   FOREIGN KEY (VenueName) REFERENCES Venue(VenueName)
 );
 
@@ -93,7 +107,7 @@ CREATE TABLE Medalist
   PlayerID INT NOT NULL,
  MedalType CHAR(20) NOT NULL,
   PRIMARY KEY (PlayerID),
-  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID)
+  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID) ON DELETE CASCADE 
 );
 
 CREATE TABLE ReturningAthlete
@@ -101,7 +115,7 @@ CREATE TABLE ReturningAthlete
   PlayerID INT NOT NULL,
  LastYearCompeted INT NOT NULL,
   PRIMARY KEY (PlayerID),
-  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID)
+  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID) ON DELETE CASCADE
 );
 
 CREATE TABLE Part_of
@@ -109,7 +123,7 @@ CREATE TABLE Part_of
   PlayerID INT NOT NULL,
   TeamName VARCHAR(100) NOT NULL,
   PRIMARY KEY (PlayerID, TeamName),
-  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID),
+  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID) ON DELETE CASCADE,
   FOREIGN KEY (TeamName) REFERENCES Team(TeamName)
 );
 
@@ -120,7 +134,7 @@ CREATE TABLE Competes_in
   EventName VARCHAR(100) NOT NULL,
   SportName VARCHAR(100) NOT NULL,
   PRIMARY KEY (PlayerID, EventName, SportName),
-  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID),
+  FOREIGN KEY (PlayerID) REFERENCES Athlete(PlayerID) ON DELETE CASCADE,
   FOREIGN KEY (EventName, SportName) REFERENCES Event(EventName, SportName)
 );
 
@@ -340,6 +354,10 @@ VALUES (9, 'Yan', 'Zhou', 32, 'Female', 'China', 5);
 
 INSERT 
 INTO	Athlete (PlayerID, FirstName, LastName, Age, Gender, CountryName, CoachID) 
+VALUES (91, 'Ryan', 'Getzlaf', 36, 'Male', 'Canada', 2); 
+
+INSERT 
+INTO	Athlete (PlayerID, FirstName, LastName, Age, Gender, CountryName, CoachID) 
 VALUES (10, 'David', 'Bisset', 20, 'Male', 'Canada', 7); 
 
 INSERT 
@@ -405,6 +423,10 @@ VALUES (9, 'Bronze');
 INSERT 
 INTO	Medalist (PlayerID, MedalType) 
 VALUES (10, 'Bronze'); 
+
+INSERT 
+INTO	Medalist (PlayerID, MedalType) 
+VALUES (91, 'Gold'); 
 
 
 INSERT 
@@ -472,6 +494,10 @@ INSERT
 INTO	Part_of (PlayerId, TeamName) 
 VALUES (3, "Canadian Men’s Ice Hockey Team");
 
+INSERT 
+INTO	Competes_in (Ranking, PlayerID, EventName, SportName) 
+VALUES (1, 91, 'Ice Hockey Men', 'Hockey');
+
 
 INSERT 
 INTO	Part_of (PlayerId, TeamName) 
@@ -489,5 +515,6 @@ INSERT
 INTO	Part_of (PlayerId, TeamName) 
 VALUES (10, "Canadian Bobsleigh Two-Man-Men Team");
 
-
-
+INSERT 
+INTO	Part_of (PlayerId, TeamName) 
+VALUES (91, "Canadian Men’s Ice Hockey Team");

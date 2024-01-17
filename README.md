@@ -5,4 +5,4 @@ Our database project is to manage data about the Vancouver 2010 Winter Olympics.
 Database Setup and Tech Stack:
 - AWS RDS MySQL database at endpoint: olympicsdb.coyjom3wwb7a.us-west-2.rds.amazonaws.com
 - Database management using MySQL Workbench
-- php
+- React
